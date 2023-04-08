@@ -1,4 +1,5 @@
 import { MemberField } from "./MemberField";
+import {UserDataDto} from "../db/UserDataDto";
 
 export class System {
     constructor(
@@ -9,6 +10,7 @@ export class System {
         public color: string|null,
         public description: string|null,
         // TODO
-        public avatar: null = null
+        public avatar: string|null = null,
+        public data: UserDataDto
     ) {}
 }

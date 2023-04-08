@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import { $db } from "../../db";
 import { data, error, Status } from "../status";
 import { UserDto } from "../../db/UserDto";
+import {syncWithApi} from "../../simplyApi/sync";
 
 const authSchema = S.object()
     .prop(
@@ -27,22 +28,23 @@ export default controller(async (server) => {
 
         if (!!(await $db.user.findUnique({ where: { username } }))) {
             return res.status(400).send({
-                error: 'This email is already registered!'
+                error: 'This username is already used!'
             })
         }
 
         const user = await $db.user.create({
             data: {
                 username,
-                passwordHash: await bcrypt.hash(password, 10)
+                passwordHash: await bcrypt.hash(password, 10),
+                visible: false,
             }
         })
 
         req.session.set("userId", user.id);
 
-        return res.send({
+        return res.send(data({
             user
-        })
+        }))
     })
 
     server.post<AuthSchema>("/login", { schema: authSchema.valueOf() }, async (req, res) => {
@@ -51,12 +53,14 @@ export default controller(async (server) => {
         const user = await $db.user.findUnique({
             where: {
                 username
-            }
+            },
         })
 
         if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
             return res.status(400).send(error(Status.Login.InvalidCredentials))
         }
+
+        await syncWithApi(user);
 
         req.session.set("userId", user.id);
 

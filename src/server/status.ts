@@ -8,7 +8,13 @@ export const Status = {
     },
     Register: {
         UsernameAlreadyUsed: "Username is already used",
-    }
+    },
+    UserUpdate: {
+        InvalidOverride: "Invalid Override Plural ID",
+    },
+    ResourceNotFound: "Resource not found",
+    Unauthorized: "Unauthorized"
+
 }
 
 export interface SuccessResponse<TData extends object = object> {

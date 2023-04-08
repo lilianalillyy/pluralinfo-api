@@ -3,22 +3,41 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id           String       @id @default(uuid())
-  username        String       @unique
-  passwordHash String
-  pluralKey    String?
-  members      UserMember[]
+  id               String       @id @default(auto()) @map("_id") @db.ObjectId
+  username         String       @unique
+  passwordHash     String
+  pluralKey        String?
+  overridePluralId String?
+  admin            Boolean      @default(false)
+  members          UserMember[]
+  fields           UserField[]
+  slug        String?
+  description String?
+  visible     Boolean
+}
+
+model UserField {
+  id     String         @id @default(auto()) @map("_id") @db.ObjectId
+  pluralId String @unique
+  pluralOwnerId String
+  user   User?          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String?
+  description String?
+  visible     Boolean
 }
 
 model UserMember {
-  id                String @id @default(uuid())
-  pluralId          String @unique
-  user              User   @relation(fields: [userId], references: [id])
-  userId            String
-  customDescription String
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  pluralId      String          @unique
+  pluralOwnerId String
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId        String
+  slug        String?
+  description String?
+  visible     Boolean
 }

@@ -1,4 +1,4 @@
-import { User } from '@prisma/client'
+import {User} from '@prisma/client'
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { $db } from '../../db'
 import { Status, ErrorResponse, error } from '../status'
@@ -10,7 +10,7 @@ interface UseUserContext {
 
 interface UserContext {
     success: true,
-    user: User
+    user: User,
 }
 
 /**

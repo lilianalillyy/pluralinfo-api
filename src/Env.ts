@@ -7,6 +7,8 @@ export interface Variables {
     HOST: string;
     PORT: string;
     CORS_ORIGIN: string;
+    REDIS_HOST: string;
+    REDIS_PASS: string;
 }
 
 export class Env<T extends { [key: string]: any }> {
@@ -15,11 +17,12 @@ export class Env<T extends { [key: string]: any }> {
     constructor() {
         const out = dotenv.config();
 
-        if (out.error) {
-            throw new EnvMissingException("Cannot load .env file! Please make sure it's located in the root directory.");
-        }
+        console.warn("No .env file found, skipping dotenv")
 
-        this._env = (out.parsed as any) ?? {};
+        this._env = {
+            ...process.env,
+            ...(out.error ? (out.parsed as any) ?? {} : {})
+        };
     }
 
     get<Throw extends boolean = true>(key: keyof T, throwException: Throw): Throw extends true ?  T[typeof key] : T[typeof key] | null {
